@@ -296,7 +296,7 @@ function utt_load_work_hour(){
         </div>
         </div>";
         if($wk->assignedWorkLoad > $wk->maxWorkLoad)
-            echo "<script type = \"text/javascript\">jQuery(\"#messages\").html(\"<div id='message' class='error'>Too much workload</div>\");</script>";
+            echo "<script type = \"text/javascript\">jQuery(\"#messages\").html(\"<div id='message' class='error'>Warning: Too much workload</div>\");</script>";
     }
     die();
 }
@@ -316,8 +316,7 @@ function utt_insert_update_lecture(){
     $maxwork=$_GET['maxwork'];
     $minwork=$_GET['minWork'];
     $assignedwork=$_GET['assignedwork'];
-    echo $time;
-    echo $endTime;
+    $minmaxworkloadTable=$wpdb->prefix."utt_minmax_workload";
     $lecturesTable=$wpdb->prefix."utt_lectures";
     $eventsTable=$wpdb->prefix."utt_events";
     //is insert
@@ -332,9 +331,9 @@ function utt_insert_update_lecture(){
             //adds record to selected week, next loop adds to next week etc...
             $d->modify('+'.$j.' weeks');
             $usedDate = $d->format('y-m-d');
-               
             $datetime = $usedDate." ".$time;
             $endDatetime = $usedDate." ".$endTime;
+            $assignedwork = $assignedwork + ($endTime - $time);
             //check if there is conflict
             $busyTeacher = $wpdb->get_row($wpdb->prepare("SELECT * FROM $lecturesTable WHERE teacherID=%d AND %s<end AND %s>start;",$teacher,$datetime,$endDatetime));
             $busyClassroom1 = $wpdb->get_row($wpdb->prepare("SELECT * FROM $lecturesTable WHERE classroomID=%d AND %s<end AND %s>start;",$classroom,$datetime,$endDatetime));
@@ -345,8 +344,10 @@ function utt_insert_update_lecture(){
                 $exists = 1;
                 break;
             }else{
-
                 $safeSql = $wpdb->prepare("INSERT INTO $lecturesTable (groupID, classroomID, teacherID, start, end) VALUES( %d, %d, %d, %s, %s)",$group,$classroom,$teacher,$datetime,$endDatetime);
+                $wpdb->query($safeSql);
+
+                $safeSql = $wpdb->prepare("UPDATE $minmaxworkloadTable SET assignedWorkLoad=%d WHERE teacherID=%d;", $assignedwork, $teacher);
                 $wpdb->query($safeSql);
             }
         }
@@ -522,6 +523,7 @@ function utt_delete_lecture(){
     $deleteAll = $_GET['delete_all'];
     $lectureID = $_GET['lecture_id'];
     $lecturesTable=$wpdb->prefix."utt_lectures";
+    $minmaxworkloadTable=$wpdb->prefix."utt_minmax_workload";
     $safeSql = $wpdb->prepare("SELECT * FROM $lecturesTable WHERE lectureID=%d",$lectureID);
     $lecture = $wpdb->get_row($safeSql);
     //if delete all is 1, delete all lectures for this group
@@ -532,8 +534,19 @@ function utt_delete_lecture(){
     }else{
         $safeSql = $wpdb->prepare("DELETE FROM `$lecturesTable` WHERE lectureID=%d;",$lectureID);
         $wpdb->query($safeSql);
+        $enddate = explode(" ", $lecture->end);
+        $startdate = explode(" ", $lecture->start);
+        $diff = $enddate[1] - $startdate[1];
+        
+        $safeSql = $wpdb->prepare("SELECT * FROM $minmaxworkloadTable WHERE teacherID=%d;", $lecture->teacherID);
+        $lecture = $wpdb->get_row($safeSql);
+    
+        $assignedwork = $lecture->assignedWorkLoad - $diff;
+    
+        $safeSql = $wpdb->prepare("UPDATE $minmaxworkloadTable SET assignedWorkLoad=%d WHERE teacherID=%d;", $assignedwork, $lecture->teacherID);
+        $wpdb->query($safeSql);
     }
-    die();
+    
 }
 
 //ajax response load filter

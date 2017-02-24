@@ -314,9 +314,9 @@ jQuery(function ($) {
       var time = $('#time').val();
       var endTime = $('#endTime').val();
       var weeks = $('#weeks').val();
-      var maxwork = $('#maxwork').val;
-      var minwork = $('#minwork').val;
-      var assignedwork = $('assignedwork').val;
+      var maxwork = $('#maxwork').val();
+      var minwork = $('#minwork').val();
+      var assignedwork = $('#assignedwork').val();
       var success = 0;
       //validation
       if (period == 0) {
