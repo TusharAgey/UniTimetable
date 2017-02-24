@@ -14,6 +14,7 @@ function utt_teacher_scripts(){
         'cancel' => __( 'Cancel', 'UniTimetable' ),
         'surnameVal' => __( 'Surname field is required. Please avoid using special characters.', 'UniTimetable' ),
         'nameVal' => __( 'Please avoid using special characters at Name field.', 'UniTimetable' ),
+        'minmaxWork' => __( 'Please provide valid working hours' ),
         'insertTeacher' => __( 'Insert Teacher', 'UniTimetable' ),
         'reset' => __( 'Reset', 'UniTimetable' ),
         'failAdd' => __( 'Failed to add Teacher. Check if the Teacher already exists.', 'UniTimetable' ),
@@ -36,6 +37,12 @@ function utt_create_teachers_page(){
         <br/>
         <?php _e("Name:","UniTimetable"); ?><br/>
         <input type="text" name="firstname" id="firstname" class="dirty"/>
+        <br/>
+        <?php _e("Minimum workload:","UniTimetable"); ?><br/>
+        <input type="text" name="minwork" id="minwork" class="dirty" required placeholder="<?php _e("Required","UniTimetable"); ?>"/>
+        <br/>
+        <?php _e("Maximum workload:","UniTimetable"); ?><br/>
+        <input type="text" name="maxwork" id="maxwork" class="dirty" required placeholder="<?php _e("Required","UniTimetable"); ?>"/>
         <br/>
         <div id="secondaryButtonContainer">
         <input type="submit" value="<?php _e("Submit","UniTimetable"); ?>" id="insert-updateTeacher" class="button-primary"/>
@@ -122,6 +129,9 @@ function utt_insert_update_teacher(){
     $firstname=$_GET['teacher_name'];
     $lastname=$_GET['teacher_surname'];
     $teacherid=$_GET['teacher_id'];
+    $maxhour=$_GET['teacher_max_work'];
+    $minhour=$_GET['teacher_min_work'];
+    $minmaxworkloadTable=$wpdb->prefix."utt_minmax_workload";
     $teachersTable=$wpdb->prefix."utt_teachers";
     //insert
     if($teacherid==0){
@@ -129,11 +139,18 @@ function utt_insert_update_teacher(){
         $success = $wpdb->query($safeSql);
         if($success == 1){
             //success
+            //Now add working hours too
+            $teacherNewID = $wpdb->get_row($wpdb->prepare("SELECT * FROM $teachersTable WHERE name=%s AND surname=%s", $firstname,$lastname));
+            $val = $teacherNewID->teacherID;
+            $safeSql = $wpdb->prepare("INSERT INTO $minmaxworkloadTable (teacherID, minWorkLoad, maxWorkLoad, assignedWorkLoad) VALUES (%d, %d, %d, 0)",$val,$minhour,$maxhour);
+            $wpdb->query($safeSql);
+
             echo 1;
         }else{
             //fail
             echo 0; 
         }
+
     //edit
     }else{
         $safeSql = $wpdb->prepare("UPDATE $teachersTable SET name=%s, surname=%s WHERE teacherID=%d; ",$firstname,$lastname,$teacherid);

@@ -26,6 +26,7 @@ function utt_activate(){
     $holidaysTable=$wpdb->prefix."utt_holidays";
     $eventsTable=$wpdb->prefix."utt_events";
     $lecturesView=$wpdb->prefix."utt_lectures_view";
+    $minmaxworkloadTable=$wpdb->prefix."utt_minmax_workload";
     $charset_collate = $wpdb->get_charset_collate();
     
     //create utt tables
@@ -153,6 +154,22 @@ function utt_activate(){
             $charset_collate;";
     dbDelta($sql);
     
+    $sql="CREATE TABLE IF NOT EXISTS `$minmaxworkloadTable` (
+            teacherID smallint UNSIGNED NOT NULL COMMENT 'FKey from Teachers',
+            minWorkLoad smallint UNSIGNED NOT NULL COMMENT 'minimum workload for teacher',
+            maxWorkLoad smallint UNSIGNED NOT NULL COMMENT 'maximum workload for teacher',
+            assignedWorkLoad smallint UNSIGNED NOT NULL COMMENT 'actual assigned workload for teacher',
+            KEY `fk_WorkLoad_Teachers1_idx` (teacherID ASC),
+            PRIMARY KEY  (teacherID),
+            CONSTRAINT `fk_WorkLoad_Teachers`
+            FOREIGN KEY (teacherID)
+            REFERENCES `$teachersTable` (teacherID)
+            ON DELETE CASCADE
+            ON UPDATE CASCADE)
+            ENGINE = InnoDB
+            $charset_collate;";
+    dbDelta($sql);
+
     //create view
     $wpdb->query("CREATE  OR REPLACE VIEW $lecturesView AS
             SELECT
@@ -235,6 +252,9 @@ function utt_uninstall(){
     $wpdb->query($sql);
     
     $sql="DROP TABLE IF EXISTS `$holidaysTable` ;";
+    $wpdb->query($sql);
+
+    $sql="DROP TABLE IF EXISTS `$minmaxworkloadTable`;";
     $wpdb->query($sql);
 }
 

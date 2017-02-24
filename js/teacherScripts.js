@@ -54,8 +54,11 @@ jQuery(function ($) {
       var teacherID = $('#teacherid').val();
       var teacherName = $('#firstname').val();
       var teacherSurName = $('#lastname').val();
+      var teacherMinWork = $('#minwork').val();
+      var teacherMaxWork = $('#maxwork').val();
       var regexName = /^[α-ωΑ-ΩA-Za-zΆ-Ώά-ώ0-9_\s-.\/]{0,35}$/;
       var regexSurName = /^[α-ωΑ-ΩA-Za-zΆ-Ώά-ώ0-9_\s-.\/]{3,35}$/;
+      var regexHour = /^[0-9]{1,2}$/;
       var success = 0;
       //validation
       if (!regexSurName.test(teacherSurName)) {
@@ -66,12 +69,18 @@ jQuery(function ($) {
          alert(teacherStrings.nameVal);
          return false;
       }
+      if (!regexHour.test(teacherMinWork) || !regexHour.test(teacherMaxWork)){
+         alert(teacherStrings.minmaxWork);
+         return false;
+      }
       //ajax data
       var data = {
          action: 'utt_insert_update_teacher',
          teacher_id: teacherID,
          teacher_name: teacherName,
-         teacher_surname: teacherSurName
+         teacher_surname: teacherSurName,
+         teacher_min_work: teacherMinWork,
+         teacher_max_work: teacherMinWork
       };
       //ajax call
       $.get('admin-ajax.php' , data, function(data){
@@ -121,6 +130,8 @@ jQuery(function ($) {
       $('#lastname').val("");
       $('#teacherid').val(0);
       $('#clearTeacherForm').html(teacherStrings.reset);
+      $('#minwork').val("");
+      $('#maxwork').val("");
       $('#message').remove();
       isDirty = 0;
       return false;
