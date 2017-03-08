@@ -14,7 +14,6 @@ function utt_group_scripts(){
         'cancel' => __( 'Cancel', 'UniTimetable' ),
         'periodVal' => __( 'Please select a Period.', 'UniTimetable' ),
         'semesterVal' => __( 'Please select Semester.', 'UniTimetable' ),
-        'subjectVal' => __( 'Please select Subject.', 'UniTimetable' ),
         'nameVal' => __( 'Please avoid using special characters and do not use long names.', 'UniTimetable' ),
         'insertGroup' => __( 'Insert Group', 'UniTimetable' ),
         'reset' => __( 'Reset', 'UniTimetable' ),
@@ -50,25 +49,18 @@ function utt_create_groups_page(){
 		</select>
             </div>
             <div class="element">
-		<?php _e("Semester:","UniTimetable"); ?><br/>
-		<select name="semester" id="semester" class="dirty" onchange="loadSubjects(0);">
-                    <option value="0"><?php _e("- select -","UniTimetable"); ?></option>
-                    <?php
-                    //show semester numbers
-                    for( $i=1 ; $i<11 ; $i++ ){
-			echo "<option value='$i'>$i</option>";
-                    }
-                    ?>
-		</select>
+            <?php _e("Semester:","UniTimetable"); ?><br/>
+            <select name="semester" id="semester" class="dirty" >
+                <option value="0"><?php _e("- select -","UniTimetable"); ?></option>
+                <?php
+                //show semester numbers
+                for( $i=1 ; $i<11 ; $i++ ){
+                    echo "<option value='$i'>$i</option>";
+                }
+                ?>
+            </select>
             </div>
             <div class="element firstInRow">
-		<?php _e("Subject:","UniTimetable"); ?><br/>
-		<!-- load subjects when semester number is selected -->
-		<div id="subjects">
-		    <select name="subject" id="subject" class="dirty">
-			<option value='0'><?php _e("- select -","UniTimetable"); ?></option>
-		    </select>
-		</div>
             </div>
             <div class="element">
 		<!-- select number of groups to be created -->
@@ -178,9 +170,9 @@ function utt_view_groups(){
     }
     //if not selected semester, show for all semesters
     if($semester==0){
-        $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable, $subjectsTable WHERE $groupsTable.subjectID=$subjectsTable.subjectID AND periodID=%d ORDER BY title, type, groupName",$periodID);
+        $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable, $periodsTable WHERE periodID=%d ORDER BY title, groupName",$periodID);
     }else{
-        $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable, $subjectsTable WHERE $groupsTable.subjectID=$subjectsTable.subjectID AND periodID=%d AND semester=%d ORDER BY title, type, groupName",$periodID,$semester);
+        $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable WHERE periodID=%d AND semester=%d ORDER BY title, type, groupName",$periodID,$semester);
     }
     $groups = $wpdb->get_results($safeSql);
 ?>

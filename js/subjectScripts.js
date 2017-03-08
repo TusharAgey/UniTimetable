@@ -31,7 +31,7 @@ function deleteSubject(subjectID){
    return false;
 }
 //edit function
-function editSubject(subjectID,title,type,semester,color) {
+function editSubject(subjectID,title,semester,color) {
    //if form is being completed it does not let you delete
    if (isDirty==1) {
       alert(subjectStrings.editForbidden)
@@ -40,7 +40,6 @@ function editSubject(subjectID,title,type,semester,color) {
    //fill form
    document.getElementById('subjectid').value=subjectID;
    document.getElementById('subjectname').value=title;
-   document.getElementById('subjecttype').value=type;
    document.getElementById('semester').value=semester;
    document.getElementById('color').value=color;
    jQuery('#color').css("background-color","#"+color);
@@ -71,7 +70,6 @@ jQuery(function ($) {
          //data
          var subjectID = $('#subjectid').val();
          var subjectName = $('#subjectname').val();
-         var subjectType = $('#subjecttype').val();
          var semester = $('#semester').val();
          var color = $('#color').val();
          var regexSubjectName = /^[α-ωΑ-ΩA-Za-zΆ-Ώά-ώ0-9\s-_\/.&]{3,64}$/;
@@ -80,10 +78,6 @@ jQuery(function ($) {
          //validation
          if (!regexSubjectName.test(subjectName)) {
             alert(subjectStrings.nameVal);
-            return false;
-         }
-         if (subjectType == 0) {
-            alert(subjectStrings.typeVal);
             return false;
          }
          if (semester == 0) {
@@ -99,7 +93,6 @@ jQuery(function ($) {
             action: 'utt_insert_update_subject',
             subject_id: subjectID,
             subject_name: subjectName,
-            subject_type: subjectType,
             semester: semester,
             color: color
          };
@@ -117,7 +110,6 @@ jQuery(function ($) {
                }
                //clear form
                $('#subjectid').val(0);
-               $('#subjecttype').val(0);
                $('#subjectTitle').html(subjectStrings.insertSubject);
                $('#clearSubjectForm').html(subjectStrings.reset);
                isDirty = 0;
@@ -149,7 +141,6 @@ jQuery(function ($) {
         $('#subjectTitle').html(subjectStrings.insertSubject);
         $('#subjectid').val(0);
         $('#subjectname').val("");
-        $('#subjecttype').val(0);
         $('#semester').val(0);
         $('#color').val("FFFFFF");
         $('#color').css("background-color","white");

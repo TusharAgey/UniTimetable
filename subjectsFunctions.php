@@ -39,13 +39,6 @@ function utt_create_subjects_page(){
             <input type="text" name="subjectname" id="subjectname" class="dirty" size="40" placeholder="<?php _e("Required","UniTimetable"); ?>"/>
             </div>
             <div class="element2 firstInRow last">
-            <?php _e("Type:","UniTimetable"); ?><br/>
-            <select name="subjecttype" class="dirty" id="subjecttype">
-                <option value="0"><?php _e("- select -","UniTimetable"); ?></option>
-                <option value="T"><?php _e("Theory","UniTimetable"); ?></option>
-                <option value="L"><?php _e("Lab","UniTimetable"); ?></option>
-                <option value="PE"><?php _e("Practice Exercises","UniTimetable"); ?></option>
-            </select>
             </div>
             <div class="element2">
             <?php _e("Semester:","UniTimetable"); ?><br/>
@@ -94,13 +87,12 @@ function utt_insert_update_subject(){
     //data
     $subjectID=$_GET['subject_id'];
     $subjectName=$_GET['subject_name'];
-    $subjectType=$_GET['subject_type'];
     $semester=$_GET['semester'];
     $color=$_GET['color'];
     $subjectsTable=$wpdb->prefix."utt_subjects";
     //insert
     if($subjectID==0){
-        $safeSql = $wpdb->prepare("INSERT INTO $subjectsTable (title, type, semester, color) VALUES (%s,%s,%s,%s)",$subjectName,$subjectType,$semester,$color);
+        $safeSql = $wpdb->prepare("INSERT INTO $subjectsTable (title, semester, color) VALUES (%s,%s,%s)",$subjectName,$semester,$color);
         $success = $wpdb->query($safeSql);
         if($success == 1){
             //success
@@ -111,7 +103,7 @@ function utt_insert_update_subject(){
         }
     //edit
     }else{
-        $safeSql = $wpdb->prepare("UPDATE $subjectsTable SET title=%s, type=%s, semester=%s, color=%s WHERE subjectID=%d ",$subjectName,$subjectType,$semester,$color,$subjectID);
+        $safeSql = $wpdb->prepare("UPDATE $subjectsTable SET title=%s, semester=%s, color=%s WHERE subjectID=%d ",$subjectName,$semester,$color,$subjectID);
         $success = $wpdb->query($safeSql);
         if($success == 1){
             //success
@@ -148,10 +140,10 @@ function utt_view_subjects(){
     }
     //if not selected semester, view all subjects
     if($semester==0 || $semester==""){
-        $subjects = $wpdb->get_results("SELECT * FROM $subjectsTable ORDER BY title, type");
+        $subjects = $wpdb->get_results("SELECT * FROM $subjectsTable ORDER BY title");
     //view filtered subjects
     }else{
-        $safeSql = $wpdb->prepare("SELECT * FROM $subjectsTable WHERE semester=%d ORDER BY title, type",$semester);
+        $safeSql = $wpdb->prepare("SELECT * FROM $subjectsTable WHERE semester=%d ORDER BY title",$semester);
         $subjects = $wpdb->get_results($safeSql);
     }
     //show registered subjects
@@ -161,7 +153,6 @@ function utt_view_subjects(){
             <thead>
                 <tr>
                     <th><?php _e("Subject","UniTimetable"); ?></th>
-                    <th><?php _e("Type","UniTimetable"); ?></th>
                     <th><?php _e("Semester","UniTimetable"); ?></th>
                     <th><?php _e("Color","UniTimetable"); ?></th>
                     <th><?php _e("Actions","UniTimetable"); ?></th>
@@ -170,7 +161,6 @@ function utt_view_subjects(){
             <tfoot>
                 <tr>
                     <th><?php _e("Subject","UniTimetable"); ?></th>
-                    <th><?php _e("Type","UniTimetable"); ?></th>
                     <th><?php _e("Semester","UniTimetable"); ?></th>
                     <th><?php _e("Color","UniTimetable"); ?></th>
                     <th><?php _e("Actions","UniTimetable"); ?></th>
@@ -188,18 +178,11 @@ function utt_view_subjects(){
                 $addClass = "class='white'";
                 $bgcolor = 1;
             }
-            //translate subject type
-            if($subject->type == "T"){
-                $type = __("T","UniTimetable");
-            }else if($subject->type == "L"){
-                $type = __("L","UniTimetable");
-            }else{
-                $type = __("PE","UniTimetable");
-            }
+
             //a record
-            echo "<tr id='$subject->subjectID' $addClass><td>$subject->title</td><td>$type</td><td>$subject->semester</td><td><span style='background-color:#$subject->color'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> $subject->color</td>
+            echo "<tr id='$subject->subjectID' $addClass><td>$subject->title</td><td>$subject->semester</td><td><span style='background-color:#$subject->color'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span> $subject->color</td>
                 <td><a href='#' onclick='deleteSubject($subject->subjectID);' class='deleteSubject'><img id='edit-delete-icon' src='".plugins_url('icons/delete_icon.png', __FILE__)."'/> ".__("Delete","UniTimetable")."</a>&nbsp;
-                <a href='#' onclick=\"editSubject($subject->subjectID, '$subject->title', '$subject->type', $subject->semester, '$subject->color');\" class='editSubject'><img id='edit-delete-icon' src='".plugins_url('icons/edit_icon.png', __FILE__)."'/> ".__("Edit","UniTimetable")."</a></td></tr>";
+                <a href='#' onclick=\"editSubject($subject->subjectID, '$subject->title', $subject->semester, '$subject->color');\" class='editSubject'><img id='edit-delete-icon' src='".plugins_url('icons/edit_icon.png', __FILE__)."'/> ".__("Edit","UniTimetable")."</a></td></tr>";
         }
     ?>
             </tbody>

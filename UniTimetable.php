@@ -38,16 +38,15 @@ function utt_activate(){
             ENGINE = InnoDB
             $charset_collate;";
     dbDelta($sql);
-    
+
     $sql="CREATE TABLE IF NOT EXISTS `$subjectsTable` (
             subjectID int UNSIGNED NOT NULL AUTO_INCREMENT,
             title varchar(64) NOT NULL COMMENT 'Subject\' s official Name',
-            type varchar(45) NOT NULL COMMENT 'Subject type ex. Theory, Lab, Practice Exercises etc.',
             semester tinyint UNSIGNED NOT NULL COMMENT 'semester where the subject belongs',
             is_enabled tinyint(1) NOT NULL DEFAULT 1 COMMENT 'if the subject is active - application will show only active subjects',
             color varchar(45) NOT NULL COMMENT 'color shown in the curriculum',
             PRIMARY KEY  (subjectID),
-            UNIQUE KEY `unique_subject` (title ASC, type ASC))
+            UNIQUE KEY `unique_subject` (title ASC))
             ENGINE = InnoDB
             $charset_collate;";
     dbDelta($sql);
@@ -170,7 +169,6 @@ function utt_activate(){
                 groupName,
                 $subjectsTable.subjectID,
                 $subjectsTable.title AS subjectTitle,
-                $subjectsTable.type AS subjectType,
                 color,
                 $classroomsTable.name AS classroomName,
                 $classroomsTable.type AS classroomType,
