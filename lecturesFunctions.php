@@ -170,20 +170,11 @@ function utt_create_lectures_page(){
             <?php _e("End time:","UniTimetable"); ?><br/>
             <input name="endTime" id="endTime" class="dirty" value="10:00" size="10"/>
         </div>
-        <div class="element weekDiv">
-            <?php _e("Number of weeks:","UniTimetable"); ?><br/>
-            <select name="weeks" id="weeks" class="dirty">
-                <?php
-                for( $i=1 ; $i<26 ; $i++ ){
-                    echo "<option value='$i'>$i</option>";
-                }
-                ?>
-            </select>
+        
+        <div id="secondaryButtonContainer">
+            <input type="submit" value="<?php _e("Submit","UniTimetable"); ?>" id="insert-updateLecture" class="button-primary"/>
+            <a href='#' class='button-secondary' id="clearLectureForm"><?php _e("Reset","UniTimetable"); ?></a>
         </div>
-            <div id="secondaryButtonContainer">
-                <input type="submit" value="<?php _e("Submit","UniTimetable"); ?>" id="insert-updateLecture" class="button-primary"/>
-                <a href='#' class='button-secondary' id="clearLectureForm"><?php _e("Reset","UniTimetable"); ?></a>
-            </div>
     </form>
     <div id="messages"></div>
     <div id="filters">
@@ -313,7 +304,6 @@ function utt_insert_update_lecture(){
     $date=$_GET['date'];
     $time=$_GET['time'];
     $endTime=$_GET['endTime'];
-    $weeks=$_GET['weeks'];
     $maxwork=$_GET['maxwork'];
     $minwork=$_GET['minWork'];
     $assignedwork=$_GET['assignedwork'];
@@ -329,7 +319,7 @@ function utt_insert_update_lecture(){
         //if conflict with a teacher, classroom or group, exists becomes 1
         $exists = 0;
         //insert records depending on weeks number
-        for ($j=0;$j<=$weeks-1;$j++){
+        for ($j=0;$j<=15;$j++){
             $d = new DateTime($date);
             //adds record to selected week, next loop adds to next week etc...
             $d->modify('+'.$j.' weeks');
@@ -363,8 +353,10 @@ function utt_insert_update_lecture(){
             }else{
                 $safeSql = $wpdb->prepare("INSERT INTO $lecturesTable (groupID, classroomID, teacherID, start, end) VALUES( %d, %d, %d, %s, %s)",$group,$classroom,$teacher,$datetime,$endDatetime);
                 $wpdb->query($safeSql);
-                $safeSql = $wpdb->prepare("UPDATE $teachersTable SET assignedWorkLoad=%d WHERE teacherID=%d;", $assignedwork, $teacher);
-                $wpdb->query($safeSql);
+                if($j == 0){//do only for one instance.
+	                $safeSql = $wpdb->prepare("UPDATE $teachersTable SET assignedWorkLoad=%d WHERE teacherID=%d;", $assignedwork, $teacher);
+	                $wpdb->query($safeSql);
+	            }
             }
         }
         //if exists is 0 then commit transaction
@@ -546,17 +538,18 @@ function utt_delete_lecture(){
     if($deleteAll==1){
         $safeSql = $wpdb->prepare("DELETE FROM $lecturesTable WHERE groupID=%d ;",$lecture->groupID);
         $wpdb->query($safeSql);
-    //else delete only this lecture
-    }else{
-        $safeSql = $wpdb->prepare("DELETE FROM `$lecturesTable` WHERE lectureID=%d;",$lectureID);
-        $wpdb->query($safeSql);
 
+        //decrement the workload only if all "this slot" lecture form all 16 weeks is being deleted.
         $enddate = explode(" ", $lecture->end);
         $startdate = explode(" ", $lecture->start);
         $diff = $enddate[1] - $startdate[1];
         $assignedwork = $lecture->assignedWorkLoad - $diff;
     
         $safeSql = $wpdb->prepare("UPDATE $teachersTable SET assignedWorkLoad=%d WHERE teacherID=%d;", $assignedwork, $lecture->teacherID);
+        $wpdb->query($safeSql);
+    //else delete only this lecture
+    }else{
+        $safeSql = $wpdb->prepare("DELETE FROM `$lecturesTable` WHERE lectureID=%d;",$lectureID);
         $wpdb->query($safeSql);
     }
     die();
