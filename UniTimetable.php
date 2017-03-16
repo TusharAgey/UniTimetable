@@ -8,6 +8,9 @@ Author: Fotis Kokkoras, Antonis Roussos
 Author URI: https://www.linkedin.com/pub/antonis-roussos/47/25b/9a5
 License: GPLv2
 */
+asdasd
+asd
+asd
 
 //register utt_activate function to run when user activates the plugin
 register_activation_hook( __FILE__, 'utt_activate' );
