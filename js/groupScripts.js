@@ -2,24 +2,18 @@
 var isDirty = 0;
 //shows groups
 function viewGroups(){
-    //filters
-    var periodID = document.getElementById('periodFilter').value;
-    var semester = document.getElementById('semesterFilter').value;
-    //ajax data
     var data = {
         action: 'utt_view_groups',
-        period_id: periodID,
-        semester: semester
-    }
+    };
     //ajax call
     jQuery.get('admin-ajax.php', data, function(data){
         //return data
         jQuery('#groupsResults').html(data);
-    })
+    });
     return false;
 }
 //edit function
-function editGroup(groupID,periodID,semester,subjectID,groupName) {
+function editGroup(groupID,groupPrefix, groupNo) {
     //if form is being completed it does not let you edit
     if (isDirty==1) {
         alert(groupStrings.editForbidden);
@@ -27,11 +21,9 @@ function editGroup(groupID,periodID,semester,subjectID,groupName) {
     }
     //fill form with data
     document.getElementById('groupID').value=groupID;
-    document.getElementById('period').value=periodID;
-    document.getElementById('semester').value=semester;
     document.getElementById("groupsNumber").value=1;
     document.getElementById("groupsNumber").disabled = true;
-    document.getElementById('groupsName').value=groupName;
+    document.getElementById('groupsName').value=groupPrefix;
     document.getElementById('groupTitle').innerHTML=groupStrings.editGroup;
     document.getElementById('clearGroupForm').innerHTML=groupStrings.cancel;
     jQuery('.counterStart').hide();
@@ -93,10 +85,7 @@ jQuery(function ($) {
             alert(groupStrings.semesterVal);
             return false;
         }
-        if (subject == 0) {
-            alert(groupStrings.subjectVal);
-            return false;
-        }
+
         if (!regexGroupsName.test(groupsName)) {
             alert(groupStrings.nameVal);
             return false;
