@@ -54,9 +54,9 @@ function utt_activate(){
     $sql="CREATE TABLE IF NOT EXISTS `$groupsTable` (
             groupID int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'unique - for use in the Lectures table',
             periodID int UNSIGNED NOT NULL COMMENT 'FKey from Periods',
-            subjectID int UNSIGNED NOT NULL COMMENT 'FKey from Subjects',
+            subjectID int UNSIGNED  COMMENT 'FKey from Subjects',
             groupName varchar(30) NOT NULL COMMENT 'name of the group',
-            PRIMARY KEY  (periodID, subjectID, groupName),
+            PRIMARY KEY  (periodID, groupName),
             KEY `fk_Groups_Periods_idx` (periodID ASC),
             KEY `fk_Groups_Subject1_idx` (subjectID ASC),
             UNIQUE KEY `groupID_UNIQUE` (groupID ASC),
