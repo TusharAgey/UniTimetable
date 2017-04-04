@@ -53,23 +53,11 @@ function utt_activate(){
     
     $sql="CREATE TABLE IF NOT EXISTS `$groupsTable` (
             groupID int UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'unique - for use in the Lectures table',
-            periodID int UNSIGNED NOT NULL COMMENT 'FKey from Periods',
-            subjectID int UNSIGNED  COMMENT 'FKey from Subjects',
-            groupName varchar(30) NOT NULL COMMENT 'name of the group',
-            PRIMARY KEY  (periodID, groupName),
-            KEY `fk_Groups_Periods_idx` (periodID ASC),
-            KEY `fk_Groups_Subject1_idx` (subjectID ASC),
-            UNIQUE KEY `groupID_UNIQUE` (groupID ASC),
-            CONSTRAINT `fk_Groups_Periods`
-            FOREIGN KEY (periodID)
-            REFERENCES `$periodsTable` (periodID)
-            ON DELETE RESTRICT
-            ON UPDATE CASCADE,
-            CONSTRAINT `fk_Groups_Subjects`
-            FOREIGN KEY (subjectID)
-            REFERENCES `$subjectsTable` (subjectID)
-            ON DELETE RESTRICT
-            ON UPDATE CASCADE)
+            groupPrefix varchar(30) NOT NULL COMMENT 'prefix name of the group e.g Group',
+            groupNo int UNSIGNED NOT NULL COMMENT 'group number after prefix e.g Group1, Group2',
+            PRIMARY KEY  (groupID),
+            UNIQUE KEY  (groupPrefix, groupNo)
+            )
             ENGINE = InnoDB
             $charset_collate;";
     dbDelta($sql);
@@ -156,35 +144,36 @@ function utt_activate(){
     dbDelta($sql);
     
     //create view
-    $wpdb->query("CREATE  OR REPLACE VIEW $lecturesView AS
-            SELECT
-                periodID,
-                lectureID,
-                semester,
-                $lecturesTable.groupID,
-                $lecturesTable.classroomID,
-                $lecturesTable.teacherID,
-                start,
-                end,
-                groupName,
-                $subjectsTable.subjectID,
-                $subjectsTable.title AS subjectTitle,
-                color,
-                $classroomsTable.name AS classroomName,
-                $classroomsTable.type AS classroomType,
-                surname as teacherSurname,
-                $teachersTable.name as teacherName
-            FROM
-                $lecturesTable,
-                $groupsTable,
-                $subjectsTable,
-                $classroomsTable,
-                $teachersTable
-            WHERE
-                $lecturesTable.groupID = $groupsTable.groupID
-                    AND $groupsTable.subjectID = $subjectsTable.subjectID
-                    AND $lecturesTable.classroomID = $classroomsTable.classroomID
-                    AND $lecturesTable.teacherID = $teachersTable.teacherID;");
+    //Ignore for now, our schema and actual scheduling storage is not fixed
+//    $wpdb->query("CREATE  OR REPLACE VIEW $lecturesView AS
+//            SELECT
+//                periodID,
+//                lectureID,
+//                semester,
+//                $lecturesTable.groupID,
+//                $lecturesTable.classroomID,
+//                $lecturesTable.teacherID,
+//                start,
+//                end,
+//                groupName,
+//                $subjectsTable.subjectID,
+//                $subjectsTable.title AS subjectTitle,
+//                color,
+//                $classroomsTable.name AS classroomName,
+//                $classroomsTable.type AS classroomType,
+//                surname as teacherSurname,
+//                $teachersTable.name as teacherName
+//            FROM
+//                $lecturesTable,
+//                $groupsTable,
+//                $subjectsTable,
+//                $classroomsTable,
+//                $teachersTable
+//            WHERE
+//                $lecturesTable.groupID = $groupsTable.groupID
+//                    AND $groupsTable.subjectID = $subjectsTable.subjectID
+//                    AND $lecturesTable.classroomID = $classroomsTable.classroomID
+//                    AND $lecturesTable.teacherID = $teachersTable.teacherID;");
 
 }
 
