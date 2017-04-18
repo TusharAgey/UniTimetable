@@ -172,17 +172,6 @@ function utt_create_lectures_page(){
             <?php _e("End time:","UniTimetable"); ?><br/>
             <input name="endTime" id="endTime" class="dirty" value="10:00" size="10"/>
         </div>
-        <div class="element weekDiv">
-            <?php _e("Number of weeks:","UniTimetable"); ?><br/>
-            <select name="weeks" id="weeks" class="dirty">
-                <?php
-                for( $i=1 ; $i<26 ; $i++ ){
-                    echo "<option value='$i'>$i</option>";
-                }
-                ?>
-            </select>
-        </div>
-            
             
             <div id="secondaryButtonContainer">
                 <input type="submit" value="<?php _e("Submit","UniTimetable"); ?>" id="insert-updateLecture" class="button-primary"/>
@@ -339,7 +328,7 @@ function utt_insert_update_lecture(){
         $assignedwork = $assignedwork + ($endTime - $time);
            
         //insert records depending on weeks number
-        for ($j=0;$j<=$weeks-1;$j++){
+        for ($j=0;$j<=16;$j++){
             $d = new DateTime($date);
             //adds record to selected week, next loop adds to next week etc...
             $d->modify('+'.$j.' weeks');
