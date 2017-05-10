@@ -350,7 +350,7 @@ function utt_insert_update_lecture(){
         $assignedwork = $assignedwork + ($endTime - $time);
            
         //insert records depending on weeks number
-        for ($j=0;$j<=16;$j++){
+        for ($j=0;$j<=$weeks-1;$j++){
             $d = new DateTime($date);
             //adds record to selected week, next loop adds to next week etc...
             $d->modify('+'.$j.' weeks');
