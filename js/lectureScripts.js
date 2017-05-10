@@ -169,6 +169,20 @@ function loadSubjects(selected){
       jQuery('#subjects').html(data);
    });
 }
+//load teachers when subject and group is selected
+function loadTheTeacher(){
+   subject = jQuery('#subject').val();
+   group = jQuery('#group').val();
+   //ajax data
+   var data = {
+      action: 'utt_load_teachers',
+      teacherSubject: subject,
+      teacherGroup: group
+   }
+   jQuery.get('admin-ajax.php', data, function(data){
+      jQuery('#teacher').html(data);
+   });
+}
 //load work hours when teacher is selected
 function loadWorkHours(){
    teacherName = jQuery('#teacher').val();

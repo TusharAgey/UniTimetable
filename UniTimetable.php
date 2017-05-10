@@ -82,6 +82,21 @@ function utt_activate(){
             minWorkLoad smallint UNSIGNED NOT NULL COMMENT 'minimum workload for teacher',
             maxWorkLoad smallint UNSIGNED NOT NULL COMMENT 'maximum workload for teacher',
             assignedWorkLoad smallint UNSIGNED NOT NULL COMMENT 'actual assigned workload for teacher',
+            subjectID int UNSIGNED NOT NULL COMMENT 'FKey from Subjects',
+            KEY `fk_Teachers_Subject1_idx` (subjectID ASC),
+            CONSTRAINT `fk_Teachers_Subjects`
+            FOREIGN KEY (subjectID)
+            REFERENCES `$subjectsTable` (subjectID)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE,
+            KEY `fk_Teachers_Group1_idx` (groupID ASC),
+            groupID int UNSIGNED NOT NULL COMMENT 'FKey from Groups',
+            CONSTRAINT `fk_Teachers_Groups1`
+            FOREIGN KEY (groupID)
+            REFERENCES `$groupsTable` (groupID)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE,
+
             PRIMARY KEY  (teacherID),
             UNIQUE KEY `unique_teacher` (surname ASC, name ASC))
             ENGINE = InnoDB
@@ -257,20 +272,20 @@ function utt_UniTimetableMenu_create(){
     add_menu_page('UniTimeTable','UniTimeTable','manage_options',__FILE__,'utt_UniTimetable_page' );
     
     //add submenu pages to UniTimetable menu
-    $teachersPage = add_submenu_page( __FILE__, __("Insert Teacher","UniTimetable"), __("Teachers","UniTimetable"), 'manage_options',__FILE__.'_teachers', 'utt_create_teachers_page' );
-    add_action('load-'.$teachersPage, 'utt_teacher_scripts');
+    $subjectsPage = add_submenu_page( __FILE__, __("Insert Subject","UniTimetable"), __("Subjects","UniTimetable"), 'manage_options',__FILE__.'_subjects', 'utt_create_subjects_page' );
+    add_action('load-'.$subjectsPage, 'utt_subject_scripts');
     
     $periodsPage = add_submenu_page( __FILE__, __("Insert Period","UniTimetable"), __("Periods","UniTimetable"), 'manage_options',__FILE__.'_periods', 'utt_create_periods_page' );
     add_action('load-'.$periodsPage, 'utt_period_scripts');
     
-    $subjectsPage = add_submenu_page( __FILE__, __("Insert Subject","UniTimetable"), __("Subjects","UniTimetable"), 'manage_options',__FILE__.'_subjects', 'utt_create_subjects_page' );
-    add_action('load-'.$subjectsPage, 'utt_subject_scripts');
+    $groupsPage = add_submenu_page( __FILE__, __("Insert Group","UniTimetable"), __("Groups","UniTimetable"), 'manage_options',__FILE__.'_groups', 'utt_create_groups_page' );
+    add_action('load-'.$groupsPage, 'utt_group_scripts');
+    
+    $teachersPage = add_submenu_page( __FILE__, __("Insert Teacher","UniTimetable"), __("Teachers","UniTimetable"), 'manage_options',__FILE__.'_teachers', 'utt_create_teachers_page' );
+    add_action('load-'.$teachersPage, 'utt_teacher_scripts');
     
     $classroomsPage = add_submenu_page( __FILE__, __("Insert Classroom","UniTimetable"), __("Classrooms","UniTimetable"), 'manage_options',__FILE__.'_classrooms', 'utt_create_classrooms_page' );
     add_action('load-'.$classroomsPage, 'utt_classroom_scripts');
-    
-    $groupsPage = add_submenu_page( __FILE__, __("Insert Group","UniTimetable"), __("Groups","UniTimetable"), 'manage_options',__FILE__.'_groups', 'utt_create_groups_page' );
-    add_action('load-'.$groupsPage, 'utt_group_scripts');
     
     $holidaysPage = add_submenu_page( __FILE__, __("Insert Holiday","UniTimetable"), __("Holidays","UniTimetable"), 'manage_options',__FILE__.'_holidays', 'utt_create_holidays_page' );
     add_action('load-'.$holidaysPage, 'utt_holiday_scripts');

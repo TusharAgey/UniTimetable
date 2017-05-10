@@ -107,7 +107,7 @@ function utt_create_lectures_page(){
         <?php _e("Group:","UniTimetable"); ?><br/>
         <div id="groups">
                     <!-- place groups when subject selected -->
-                    <select name="group" id="group" class="dirty">
+                    <select name="group" id="group" class="dirty" onchange="loadTheTeacher();">
             <option value="0"><?php _e("- select -","UniTimetable"); ?></option>
                     </select>
         </div>
@@ -116,14 +116,7 @@ function utt_create_lectures_page(){
         <div class="element firstInRow">
             <?php _e("Teacher:","UniTimetable"); ?><br/>
             <select name="teacher" id="teacher" class="dirty" onchange="loadWorkHours();">
-                <?php
-                $teachersTable=$wpdb->prefix."utt_teachers";
-                $teachers = $wpdb->get_results( "SELECT * FROM $teachersTable ORDER BY surname, name");
-                echo "<option value='0'>".__("- select -","UniTimetable")."</option>";
-                foreach($teachers as $teacher){
-                    echo "<option value='$teacher->teacherID'>$teacher->surname $teacher->name</option>";
-                }
-                ?>
+                <option value="0"><?php _e("- select -","UniTimetable"); ?></option>
             </select>
         </div>
         <div class="element">
@@ -231,7 +224,7 @@ function utt_load_groups(){
     $groupsTable = $wpdb->prefix."utt_groups";
     $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable WHERE periodID=%d AND subjectID=%d ORDER BY groupName;",$period,$subject);
     $groups = $wpdb->get_results($safeSql);
-    echo "<select name='group' id='group' class='dirty'>";
+    echo "<select name='group' id='group' class='dirty' onchange='loadTheTeacher();'>";
     echo "<option value='0'>".__("- select -","UniTimetable")."</option>";
     foreach($groups as $group){
         //choose group selected when edit
@@ -275,6 +268,23 @@ function utt_load_subjects(){
     }
     echo "</select>";
     die();
+}
+//load teachers when group and subject is selected
+add_action('wp_ajax_utt_load_teachers', 'utt_load_teachers');
+function utt_load_teachers(){
+    global $wpdb;
+    $teachersTable=$wpdb->prefix."utt_teachers";
+    $sub=$_GET['teacherSubject'];
+    $grp=$_GET['teacherGroup'];
+    $safeSql = $wpdb->prepare("SELECT * FROM $teachersTable WHERE subjectID='$sub' AND groupID='$grp';");
+    $teachers = $wpdb->get_results($safeSql);
+    
+    echo "<select name='teacher' id='teacher' class='dirty' onchange='loadWorkHours();'>";
+    echo "<option value='0'>".__("- select -","UniTimetable")."</option>";
+    foreach($teachers as $teacher){
+        echo "<option value='$teacher->teacherID'>$teacher->surname $teacher->name</option>";
+    }
+    echo "</select>";
 }
 
 //load working hours when teacher is selected

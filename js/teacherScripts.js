@@ -59,6 +59,8 @@ jQuery(function ($) {
       var teacherSurName = $('#lastname').val();
       var teacherMinWork = $('#minwork').val();
       var teacherMaxWork = $('#maxwork').val();
+      var teacherSubjectID = $('#subject').val();
+      var teacherGroupID = $('#group').val();
       var regexName = /^[α-ωΑ-ΩA-Za-zΆ-Ώά-ώ0-9_\s-.\/]{0,35}$/;
       var regexSurName = /^[α-ωΑ-ΩA-Za-zΆ-Ώά-ώ0-9_\s-.\/]{3,35}$/;
       var regexHour = /^[0-9]{1,2}$/;
@@ -83,7 +85,9 @@ jQuery(function ($) {
          teacher_name: teacherName,
          teacher_surname: teacherSurName,
          teacher_min_work: teacherMinWork,
-         teacher_max_work: teacherMaxWork
+         teacher_max_work: teacherMaxWork,
+         teacher_subject_id: teacherSubjectID,
+         teacher_group_id: teacherGroupID
       };
       //ajax call
       $.get('admin-ajax.php' , data, function(data){
@@ -103,6 +107,8 @@ jQuery(function ($) {
             jQuery('#lastname').val("");
             jQuery('#minwork').val("");
             jQuery('#maxwork').val("");
+            jQuery('#subject').val("");
+            jQuery('#group').val("");
             jQuery('#teacherTitle').html(teacherStrings.insertTeacher);
             jQuery('#clearTeacherForm').html(teacherStrings.reset);
             isDirty = 0;
@@ -134,6 +140,8 @@ jQuery(function ($) {
       $('#firstname').val("");
       $('#lastname').val("");
       $('#teacherid').val(0);
+      $('#subject').val(0).change();
+      $('#group').val(0).change();
       $('#clearTeacherForm').html(teacherStrings.reset);
       $('#message').remove();
       $('#minwork').val("");
