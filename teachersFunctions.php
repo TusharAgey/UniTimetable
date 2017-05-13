@@ -96,6 +96,7 @@ function utt_view_teachers(){
     $teachersTable=$wpdb->prefix."utt_teachers";
     $subjectsTable = $wpdb->prefix."utt_subjects";
     $groupsTable = $wpdb->prefix."utt_groups";
+    $teacherSubGrp=$wpdb->prefix."utt_teacher_sub_grp";
     //show registered teachers
     $teachers = $wpdb->get_results("SELECT * FROM $teachersTable ORDER BY surname");
     ?>
@@ -140,9 +141,11 @@ function utt_view_teachers(){
                 $bgcolor = 1;
             }
             //a record
-            $safeSql = $wpdb->prepare("SELECT * FROM $subjectsTable WHERE subjectID=%d",$teacher->subjectID);
+            $safeSql = $wpdb->prepare("SELECT * FROM $teacherSubGrp WHERE teacherID=%d",$teacher->teacherID);
+            $te = $wpdb->get_row($safeSql);
+            $safeSql = $wpdb->prepare("SELECT * FROM $subjectsTable WHERE subjectID=%d",$te->subjectID);
             $subject = $wpdb->get_row($safeSql);
-            $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable WHERE groupID=%d",$teacher->groupID);
+            $safeSql = $wpdb->prepare("SELECT * FROM $groupsTable WHERE groupID=%d",$te->groupID);
             $group = $wpdb->get_row($safeSql);
 
             echo "<tr id='$teacher->teacherID' $addClass><td>$teacher->teacherID</td><td>$teacher->surname</td><td>$teacher->name</td><td>$teacher->minWorkLoad</td><td>$teacher->maxWorkLoad</td><td>$teacher->assignedWorkLoad</td><td>$subject->title</td> <td>$group->groupName</td> <td><a href='#' onclick='deleteTeacher($teacher->teacherID);' class='deleteTeacher'><img id='edit-delete-icon' src='".plugins_url('icons/delete_icon.png', __FILE__)."'/> ".__("Delete","UniTimetable")."</a>&nbsp; <a href='#' onclick=\"editTeacher($teacher->teacherID, '$teacher->surname', '$teacher->name', $teacher->minWorkLoad, $teacher->maxWorkLoad);\" class='editTeacher'><img id='edit-delete-icon' src='".plugins_url('icons/edit_icon.png', __FILE__)."'/> ".__("Edit","UniTimetable")."</a></td></tr>";
@@ -180,10 +183,17 @@ function utt_insert_update_teacher(){
     $teacherSubject=$_GET['teacher_subject_id'];
     $teacherGroup=$_GET['teacher_group_id'];
     $teachersTable=$wpdb->prefix."utt_teachers";
+    $teacherSubGrp=$wpdb->prefix."utt_teacher_sub_grp";
     //insert
     if($teacherid==0){
-        $safeSql = $wpdb->prepare("INSERT INTO $teachersTable (name, surname, minWorkLoad, maxWorkLoad, assignedWorkLoad, subjectID, groupID) VALUES (%s,%s,%d,%d,0,%d,%d)",$firstname,$lastname,$minhour,$maxhour,$teacherSubject,$teacherGroup);
+        $safeSql = $wpdb->prepare("INSERT INTO $teachersTable (name, surname, minWorkLoad, maxWorkLoad, assignedWorkLoad) VALUES (%s,%s,%d,%d,0)",$firstname,$lastname,$minhour,$maxhour);
         $success = $wpdb->query($safeSql);
+        
+        $safeSql = $wpdb->prepare("SELECT * FROM $teachersTable WHERE name=%s AND surname=%s",$firstname, $lastname);
+        $ans = $wpdb->get_row($safeSql);
+        echo $and->teacherID;
+        $safeSql = $wpdb->prepare("INSERT INTO $teacherSubGrp (teacherID, subjectID, groupID) VALUES (%d,%d,%d)", $ans->teacherID, $teacherSubject, $teacherGroup);
+        $wpdb->query($safeSql);
         if($success == 1){
             //success
             echo 1;
@@ -195,6 +205,11 @@ function utt_insert_update_teacher(){
     }else{
         $safeSql = $wpdb->prepare("UPDATE $teachersTable SET name=%s, surname=%s, minWorkLoad=%d, maxWorkLoad=%d subjectID=%d, groupID=%d WHERE teacherID=%d; ",$firstname,$lastname,$minhour,$maxhour,$teacherSubject,$teacherGroup,$teacherid);
         $success = $wpdb->query($safeSql);
+
+
+        $safeSql = $wpdb->prepare("UPDATE $teacherSubGrp SET subjectID=%d, groupID=%d WHERE teacherID=%d", $teacherSubject, $teacherGroup, $teacherid);
+        $wpdb->query($safeSql);
+       
         if($success == 1){
             //success
             echo 1;

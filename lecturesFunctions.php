@@ -274,9 +274,15 @@ add_action('wp_ajax_utt_load_teachers', 'utt_load_teachers');
 function utt_load_teachers(){
     global $wpdb;
     $teachersTable=$wpdb->prefix."utt_teachers";
+    $teacherSubGrp=$wpdb->prefix."utt_teacher_sub_grp";
     $sub=$_GET['teacherSubject'];
     $grp=$_GET['teacherGroup'];
-    $safeSql = $wpdb->prepare("SELECT * FROM $teachersTable WHERE subjectID='$sub' AND groupID='$grp';");
+
+    $safeSql = $wpdb->prepare("SELECT * FROM $teacherSubGrp WHERE subjectID='$sub' AND groupID='$grp';");
+    $teachers = $wpdb->get_row($safeSql);
+    
+
+    $safeSql = $wpdb->prepare("SELECT * FROM $teachersTable WHERE teacherID='$teachers->teacherID';");
     $teachers = $wpdb->get_results($safeSql);
     
     echo "<select name='teacher' id='teacher' class='dirty' onchange='loadWorkHours();'>";

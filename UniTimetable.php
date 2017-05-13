@@ -26,6 +26,7 @@ function utt_activate(){
     $holidaysTable=$wpdb->prefix."utt_holidays";
     $eventsTable=$wpdb->prefix."utt_events";
     $lecturesView=$wpdb->prefix."utt_lectures_view";
+    $teacherSubGrp=$wpdb->prefix."utt_teacher_sub_grp";
     $charset_collate = $wpdb->get_charset_collate();
     
     //create utt tables
@@ -74,7 +75,33 @@ function utt_activate(){
             ENGINE = InnoDB
             $charset_collate;";
     dbDelta($sql);
-    
+    $sql="CREATE TABLE IF NOT EXISTS `$teacherSubGrp`(
+            teachersubgrpID int UNSIGNED NOT NULL AUTO_INCREMENT,
+            teacherID smallint UNSIGNED NOT NULL COMMENT 'FKey from teachers table',
+            KEY `fk_teachers_id` (teacherID),
+            CONSTRAINT `fk_teacher_id`
+            FOREIGN KEY (teacherID)
+            REFERENCES `$teachersTable` (teacherID)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE,
+            subjectID int UNSIGNED NOT NULL COMMENT 'FKey from Subjects',
+            KEY `fk_Teachers_Subject1_idx` (subjectID),
+            CONSTRAINT `fk_Teachers_Subjects`
+            FOREIGN KEY (subjectID)
+            REFERENCES `$subjectsTable` (subjectID)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE,
+            KEY `fk_Teachers_Group1_idx` (groupID),
+            groupID int UNSIGNED NOT NULL COMMENT 'FKey from Groups',
+            CONSTRAINT `fk_Teachers_Groups1`
+            FOREIGN KEY (groupID)
+            REFERENCES `$groupsTable` (groupID)
+            ON DELETE RESTRICT
+            ON UPDATE CASCADE,
+            PRIMARY KEY  (teachersubgrpID, teacherID, subjectID, groupID))
+            ENGINE = InnoDB
+            $charset_collate;";
+    dbDelta($sql);
     $sql="CREATE TABLE IF NOT EXISTS `$teachersTable` (
             teacherID smallint UNSIGNED NOT NULL AUTO_INCREMENT,
             surname varchar(35) NOT NULL COMMENT 'teacher\'s surname',
@@ -82,21 +109,6 @@ function utt_activate(){
             minWorkLoad smallint UNSIGNED NOT NULL COMMENT 'minimum workload for teacher',
             maxWorkLoad smallint UNSIGNED NOT NULL COMMENT 'maximum workload for teacher',
             assignedWorkLoad smallint UNSIGNED NOT NULL COMMENT 'actual assigned workload for teacher',
-            subjectID int UNSIGNED NOT NULL COMMENT 'FKey from Subjects',
-            KEY `fk_Teachers_Subject1_idx` (subjectID ASC),
-            CONSTRAINT `fk_Teachers_Subjects`
-            FOREIGN KEY (subjectID)
-            REFERENCES `$subjectsTable` (subjectID)
-            ON DELETE RESTRICT
-            ON UPDATE CASCADE,
-            KEY `fk_Teachers_Group1_idx` (groupID ASC),
-            groupID int UNSIGNED NOT NULL COMMENT 'FKey from Groups',
-            CONSTRAINT `fk_Teachers_Groups1`
-            FOREIGN KEY (groupID)
-            REFERENCES `$groupsTable` (groupID)
-            ON DELETE RESTRICT
-            ON UPDATE CASCADE,
-
             PRIMARY KEY  (teacherID),
             UNIQUE KEY `unique_teacher` (surname ASC, name ASC))
             ENGINE = InnoDB
